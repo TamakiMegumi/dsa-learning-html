@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DSA 学习卡片 · 标题替换我</title>
+
+<!-- LaTeX 渲染（唯一允许的外部依赖：KaTeX CDN） -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+
+<style>
+/* ============ 固定科技感配色（不要偏离） ============ */
+:root{
+  --bg:#0b0f1a; --panel:#0f1626; --border:#1e3a5f;
+  --accent:#22d3ee; --accent2:#3b82f6;
+  --text:#e6edf3; --text-dim:#9fb0c3;
+  --code-bg:#0a0e17; --code-border:#1f2a3a;
+  /* 语法高亮 */
+  --c-kw:#58a6ff; --c-fn:#d2a8ff; --c-type:#7ee787;
+  --c-str:#a5d6ff; --c-num:#ffa657; --c-com:#8b949e;
+  --c-pre:#ff7b72; --c-pun:#c9d1d9; --c-var:#e6edf3;
+  --line-active:rgba(34,211,238,.20);   /* 当前执行行底色 */
+  /* 字体：全部无衬线，避免宋体 */
+  --mono:Consolas,'Courier New','Microsoft YaHei','PingFang SC',monospace;
+  --sans:'Segoe UI',system-ui,'PingFang SC','Hiragino Sans GB','Microsoft YaHei','Source Han Sans SC','Noto Sans CJK SC',sans-serif;
+}
+*{box-sizing:border-box;}
+body{
+  margin:0; background:var(--bg); color:var(--text);
+  font-family:var(--sans); line-height:1.8;
+  background-image:radial-gradient(circle at 20% -10%,rgba(34,211,238,.08),transparent 40%),
+                   radial-gradient(circle at 90% 0%,rgba(59,130,246,.08),transparent 40%);
+}
+.wrap{max-width:920px; margin:0 auto; padding:32px 20px 80px;}
+
+/* 头部 */
+header{border-bottom:1px solid var(--border); padding-bottom:18px; margin-bottom:28px;}
+header .tag{font-family:var(--mono); color:var(--accent); font-size:13px; letter-spacing:2px; text-transform:uppercase;}
+header h1{margin:6px 0 4px; font-size:30px; font-family:var(--mono);
+  background:linear-gradient(90deg,var(--accent),var(--accent2)); -webkit-background-clip:text; background-clip:text; color:transparent;}
+header p{margin:0; color:var(--text-dim);}
+
+/* 卡片 section */
+.card{
+  background:var(--panel); border:1px solid var(--border); border-left:3px solid var(--accent);
+  border-radius:10px; padding:20px 22px; margin:18px 0;
+  box-shadow:0 0 0 1px rgba(34,211,238,.03),0 8px 30px rgba(0,0,0,.35);
+}
+h2{font-family:var(--mono); color:var(--accent); font-size:20px; margin:0 0 12px;}
+h2::before{content:"// "; color:var(--text-dim);}
+h3{color:var(--text); font-size:16px; margin:18px 0 8px;}
+p{margin:8px 0;}
+
+/* 行内代码（小药丸样式，绝不被当成代码块分行） */
+code{font-family:var(--mono); background:rgba(34,211,238,.10); color:#a5d6ff;
+  padding:1px 6px; border-radius:4px; font-size:.9em;}
+
+/* 公式块 */
+.formula{background:var(--code-bg); border:1px solid var(--code-border); border-radius:8px;
+  padding:14px 18px; margin:12px 0; text-align:center; overflow-x:auto;}
+
+/* 代码块（IDE 风格 + 行号 + 当前行高亮） */
+.code{background:var(--code-bg); border:1px solid var(--code-border); border-radius:8px; margin:14px 0; overflow:hidden;}
+.code .bar{display:flex; align-items:center; gap:7px; padding:8px 12px; background:#0c111c; border-bottom:1px solid var(--code-border);}
+.code .bar .dot{width:11px; height:11px; border-radius:50%;}
+.code .bar .dot.r{background:#ff5f56;} .code .bar .dot.y{background:#ffbd2e;} .code .bar .dot.g{background:#27c93f;}
+.code .bar .fname{margin-left:8px; font-family:var(--mono); font-size:12px; color:var(--text-dim);}
+.code pre{margin:0; padding:8px 0; overflow:auto; counter-reset:ln; max-height:500px;}
+.code code{display:block; font-family:var(--mono); font-size:14px; line-height:1.65; color:var(--c-var); white-space:pre;
+  background:none; padding:0; border-radius:0;}
+.code .cl{display:block; position:relative; padding:2px 16px 2px 50px; min-height:1.4em; transition:background .12s;}
+.code .cl::before{content:counter(ln); counter-increment:ln; position:absolute; left:0; width:38px;
+  text-align:right; color:var(--text-dim); opacity:.45; user-select:none; font-size:12px;}
+.code .cl.active{background:var(--line-active); box-shadow:inset 3px 0 0 var(--accent); border-radius:2px;}
+/* 高亮配色 */
+.c-kw{color:var(--c-kw);} .c-fn{color:var(--c-fn);} .c-type{color:var(--c-type);}
+.c-str{color:var(--c-str);} .c-num{color:var(--c-num);} .c-com{color:var(--c-com); font-style:italic;}
+.c-pre{color:var(--c-pre);} .c-pun{color:var(--c-pun);} .c-var{color:var(--c-var);}
+
+/* 动画区：左代码 / 右画布+按钮（并排） */
+.anim-flex{display:flex; gap:18px; align-items:flex-start; flex-wrap:wrap; margin:14px 0;}
+/* 左：代码面板 —— 可拖拽改变宽度（resize:horizontal） */
+.anim-flex > .code{flex:0 0 auto; width:380px; min-width:260px; max-width:680px; margin:0;
+  resize:horizontal; overflow:auto;}
+.anim-flex > .code pre{max-height:460px;}
+.anim-side{flex:1 1 300px; display:flex; flex-direction:column; gap:12px; justify-content:flex-start;}
+/* 测试数据输入行 */
+.anim-input{display:flex; gap:8px; align-items:center; flex-wrap:wrap;}
+.anim-input label{font-family:var(--mono); color:var(--text-dim); font-size:13px; white-space:nowrap;}
+.anim-input input{flex:1 1 160px; background:#0c111c; color:var(--text); border:1px solid var(--code-border);
+  border-radius:6px; padding:7px 10px; font-family:var(--mono); font-size:13px;}
+.anim-input input:focus{outline:none; border-color:var(--accent);}
+.anim-msg{font-family:var(--mono); font-size:12px; color:var(--text-dim); min-height:16px;}
+.anim-zone{background:var(--code-bg); border:1px solid var(--code-border); border-radius:8px; padding:14px; margin:0;}
+.anim-zone canvas{background:#070b12; border:1px solid var(--code-border); border-radius:6px; max-width:100%; display:block; margin:0 auto;}
+.anim-desc{font-family:var(--mono); color:var(--accent); font-size:13px; min-height:20px; margin:4px 0; text-align:center;}
+.controls{display:flex; gap:8px; justify-content:center; flex-wrap:wrap;}
+.btn{background:transparent; color:var(--accent); border:1px solid var(--accent); border-radius:6px;
+  padding:6px 14px; font-family:var(--mono); font-size:13px; cursor:pointer; transition:.15s;}
+.btn:hover{background:var(--accent); color:#04121a;}
+@media (max-width:680px){ .anim-flex{flex-direction:column;} .anim-flex > .code{resize:none; max-width:none; width:100%;} .anim-flex > .code pre{max-height:360px;} }
+
+/* 例题 / 陷阱 / 总结 / 拓展 */
+.src{color:var(--accent2); font-family:var(--mono); font-size:.85em;}
+a.src{text-decoration:none;border-bottom:1px dashed rgba(59,130,246,.55);}
+a.src:hover{text-decoration:underline;filter:brightness(1.25);}
+.tag-optional{font-size:12px; color:var(--text-dim); font-family:var(--mono);}
+/* 列表 / 练习 */
+ol,ul{margin:8px 0; padding-left:22px;} li{margin:4px 0;}
+.note{border-left:3px solid var(--accent2); padding:8px 12px; background:rgba(59,130,246,.06); border-radius:0 6px 6px 0; color:var(--text-dim);}
+footer{margin-top:40px; text-align:center; color:var(--text-dim); font-family:var(--mono); font-size:12px;}
+</style>
+</head>
+
+<body>
+<div class="wrap">
+  <!-- ============ 头部：替换标题与副标题 ============ -->
+  <header>
+    <div class="tag">Data Structure &amp; Algorithm</div>
+    <h1>标题替换我（如：冒泡排序 Bubble Sort）</h1>
+    <p>一句话简介替换我 —— 例如：最直观的交换排序，时间 $O(n^2)$。</p>
+  </header>
+
+  <!-- ============ 示例 1：概念 ============ -->
+  <section class="card">
+    <h2>概念 Concept</h2>
+    <p>用自然语言讲清楚「它是什么、解决什么问题、适合什么场景」。可配一张简单示意图或步骤列表。</p>
+  </section>
+
+  <!-- ============ 示例 2：核心思想 / 直觉（必须写，不能只给代码） ============ -->
+  <section class="card">
+    <h2>核心思想 Intuition</h2>
+    <p>用「人话」解释算法为什么能工作：每一步在做什么、利用了什么性质。
+       例如冒泡排序的核心直觉是——<b>每一轮都把当前未排序区间里最大的元素像气泡一样「浮」到末尾</b>，
+       因为相邻比较 + 交换保证较大者总向后移动。</p>
+    <ul>
+      <li><b>不变式</b>：第 $i$ 轮结束后，末尾 $i$ 个元素一定是全局最大的 $i$ 个且已就位。</li>
+      <li><b>为何终止</b>：最多 $n-1$ 轮后，前 $n-1$ 个就位，最后一个自然就位。</li>
+    </ul>
+  </section>
+
+  <!-- ============ 示例 3：数学原理（需要原理处给 LaTeX） ============ -->
+  <section class="card">
+    <h2>数学原理 Math</h2>
+    <p>把复杂度讲清楚，必要时推导。例如冒泡排序：外层 $n-1$ 轮，第 $i$ 轮内层比较 $n-1-i$ 次，
+       比较总次数为等差数列：</p>
+    <div class="formula">$$ \sum_{i=0}^{n-2}(n-1-i) = \frac{n(n-1)}{2} \in \Theta(n^2) $$</div>
+    <p>交换次数不超过比较次数（仅当逆序才交换），故最坏与平均都是 $\Theta(n^2)$，
+       最好情况（已有序）仍为 $\Theta(n)$ 轮比较、0 次交换。</p>
+  </section>
+
+  <!-- ============ 示例 4：算法实现（自由函数，载体用 STL） ============ -->
+  <section class="card">
+    <h2>算法：自由函数 Algorithm</h2>
+    <p>下面给出 <code>bubbleSort</code> 自由函数。数组只是承载元素的容器（非本讲主角），
+       因此直接用 STL 的 <code>std::vector&lt;T&gt;</code>，无需自己写数据结构；算法写成函数便于单独测试。</p>
+    <div class="code">
+      <div class="bar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="fname">bubble_sort.cpp</span></div>
+<pre><code class="cpp">#include &lt;vector&gt;
+#include &lt;utility&gt;
+
+// 冒泡排序：相邻两两比较，大的往后冒
+template &lt;typename T&gt;
+void bubbleSort(std::vector&lt;T&gt;&amp; a) {
+    int n = static_cast&lt;int&gt;(a.size());  // 数组长度
+    for (int i = 0; i &lt; n - 1; ++i) {          // 外层：共 n-1 轮
+        for (int j = 0; j &lt; n - 1 - i; ++j) {  // 内层：未排尾区
+            if (a[j] &gt; a[j + 1]) {             // 前面大于后面
+                std::swap(a[j], a[j + 1]);      // 交换二者
+            }
+        }
+    }
+}
+</code></pre>
+    </div>
+    <div class="note">写法保守、兼容 C++20：仅用 <code>template</code>、<code>std::vector</code>、<code>std::swap</code> 与清晰注释；未使用 concept / ranges / &lt;=&gt; 等易混淆新特性。</div>
+  </section>
+
+  <!-- ============ 示例 5：动画（左代码 / 右画布+按钮，代码联动，可缩放，可输入数据） ============ -->
+  <section class="card">
+    <h2>可视化动画 Animation</h2>
+    <p>动画每走一步，<b>左侧代码对应行会加深底色并随之移动</b>（IDE 单步调试观感），页面不会因代码滚动而跳动
+       （仅在代码面板内部滚动）。代码框右下角可<b>拖拽改变宽度</b>；右侧可<b>输入自定义测试数据</b>后点「加载」，
+       打开页面时默认显示示例数据。
+       <span style="color:#22d3ee">青色</span>=当前比较，<span style="color:#ff7b72">红</span>=发生交换，<span style="color:#7ee787">绿</span>=已就位。</p>
+
+    <div class="anim-flex">
+      <!-- 左：代码面板（可缩放；与动画联动，line 高亮） -->
+      <div class="code" id="bs-code">
+        <div class="bar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="fname">bubble_sort.cpp</span></div>
+<pre><code class="cpp">#include &lt;vector&gt;
+#include &lt;utility&gt;
+
+// 冒泡排序：相邻两两比较，大的往后冒
+template &lt;typename T&gt;
+void bubbleSort(std::vector&lt;T&gt;&amp; a) {
+    int n = static_cast&lt;int&gt;(a.size());  // 数组长度
+    for (int i = 0; i &lt; n - 1; ++i) {          // 外层：共 n-1 轮
+        for (int j = 0; j &lt; n - 1 - i; ++j) {  // 内层：未排尾区
+            if (a[j] &gt; a[j + 1]) {             // 前面大于后面
+                std::swap(a[j], a[j + 1]);      // 交换二者
+            }
+        }
+    }
+}
+</code></pre>
+      </div>
+
+      <!-- 右：输入 + 画布 + 控制 -->
+      <div class="anim-side">
+        <div class="anim-input">
+          <label>测试数据</label>
+          <input type="text" id="bs-input" value="5, 2, 8, 1, 9, 3, 7, 4, 6, 0" spellcheck="false">
+          <button class="btn" id="bs-load">加载</button>
+        </div>
+        <div class="anim-msg" id="bs-msg"></div>
+        <div class="anim-zone">
+          <canvas id="bs-cv" width="420" height="240"></canvas>
+          <div class="anim-desc" id="bs-desc">点击「播放」开始演示</div>
+          <div class="controls">
+            <button class="btn" id="bs-play">▶ 播放</button>
+            <button class="btn" id="bs-pause">⏸ 暂停</button>
+            <button class="btn" id="bs-step">⏭ 单步</button>
+            <button class="btn" id="bs-reset">⟲ 重置</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 示例 6：例题讲解（详细解答 + 直达链接） ============ -->
+  <section class="card">
+    <h2>例题讲解 Worked Examples</h2>
+    <p>每道例题给出<b>出处直达链接</b>（点击在新标签页打开原题）、题意，以及<b>分步详细解答思路</b>。
+       不强制贴完整代码，重在点明「如何套用本算法」。</p>
+    <ol>
+      <li>
+        <b>例题 1</b>
+        <a class="src" href="https://leetcode.com/problems/REPLACE/" target="_blank" rel="noopener">出处：LeetCode XXX · Title ↗</a>
+        <p><b>题意</b>：题目描述替换我。</p>
+        <p><b>详细思路</b>：</p>
+        <ol>
+          <li>第 1 步：如何把问题映射到本算法（如「直接原地排序」「用 partition 思想做选择」）。</li>
+          <li>第 2 步：关键观察 / 边界（如退化、区间边界、稳定性）。</li>
+          <li>第 3 步：复杂度结论（期望 / 最坏）。</li>
+        </ol>
+      </li>
+      <li>
+        <b>例题 2</b>
+        <a class="src" href="https://en.wikipedia.org/wiki/REPLACE" target="_blank" rel="noopener">出处：教材 / 题库 Title ↗</a>
+        <p><b>题意</b>：替换我。</p>
+        <p><b>详细思路</b>：替换我（分步）。</p>
+      </li>
+    </ol>
+  </section>
+
+  <!-- ============ 示例 7：常见陷阱（可选，但鼓励写） ============ -->
+  <section class="card">
+    <h2>常见陷阱 Pitfalls <span class="tag-optional">（可选）</span></h2>
+    <ul>
+      <li><b>陷阱 1</b>：说明一个典型错误（如边界条件、复杂度退化、不稳定、空输入）及其后果。</li>
+      <li><b>陷阱 2</b>：另一个易错点。</li>
+    </ul>
+  </section>
+
+  <!-- ============ 示例 8：总结 ============ -->
+  <section class="card">
+    <h2>总结 Summary</h2>
+    <p>用 2~3 句话把「核心思想、复杂度、适用场景」收口，方便记忆。
+       例如：冒泡排序靠相邻交换把大元素后移，最差与平均均为 $\Theta(n^2)$，稳定、原地，适合小规模或近乎有序的数据。</p>
+  </section>
+
+  <!-- ============ 示例 9：拓展练习 ============ -->
+  <section class="card">
+    <h2>拓展练习 Extended Exercises</h2>
+    <ol>
+      <li>比基础练习更进阶的问题（可标注出处，如 LeetCode 题目编号）。</li>
+      <li>变体 / 优化方向，例如加「本轮无交换则提前结束」的优化。</li>
+    </ol>
+  </section>
+
+  <footer>Generated by dsa-learning-html · 单文件自包含</footer>
+</div>
+
+<!-- ============ 脚本：语法高亮（自包含） + 动画控制器 ============ -->
+<script>
+/* ---------- C++ 轻量语法高亮（仅处理「块级代码」，行内 code 不动） ---------- */
+const CPP_KW = new Set(("template typename class struct using namespace public private protected virtual "
+  + "override const constexpr static inline if else for while do switch case default return break continue "
+  + "new delete true false nullptr auto void this sizeof typedef explicit friend enum union try catch throw "
+  + "noexcept unsigned signed static_cast").split(/\s+/));
+const CPP_TYPE = new Set(("int long short char bool float double size_t string vector list map set pair "
+  + "queue stack deque array T Node").split(/\s+/));
+function esc(s){return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
+function highlightCPP(src){
+  const re = /(\/\/[^\n]*|\/\*[\s\S]*?\*\/)|("(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*')|(#[^\n]*)|(\b0[xX][0-9a-fA-F]+\b|\b\d[\d_]*\.?\d*(?:[eE][+-]?\d+)?[fFlLuU]*\b)|([A-Za-z_]\w*)|(\s+)|([^\s\w])/g;
+  let out="", m;
+  while((m = re.exec(src))){
+    if(m[1])      out += '<span class="c-com">'+esc(m[1])+'</span>';
+    else if(m[2]) out += '<span class="c-str">'+esc(m[2])+'</span>';
+    else if(m[3]) out += '<span class="c-pre">'+esc(m[3])+'</span>';
+    else if(m[4]) out += '<span class="c-num">'+esc(m[4])+'</span>';
+    else if(m[5]){
+      const id=m[5]; let i=re.lastIndex; while(i<src.length && (src[i]===' '||src[i]==='\t')) i++;
+      let cls="c-var";
+      if(CPP_KW.has(id)) cls="c-kw"; else if(CPP_TYPE.has(id)) cls="c-type"; else if(src[i]==='(') cls="c-fn";
+      out += '<span class="'+cls+'">'+esc(id)+'</span>';
+    }
+    else if(m[6]) out += m[6];
+    else if(m[7]) out += '<span class="c-pun">'+esc(m[7])+'</span>';
+  }
+  return out;
+}
+
+/* ---------- 动画控制器 Anim（支持代码联动；每步都高亮当前行） ---------- */
+class Anim{
+  constructor(o){
+    this.cv=document.getElementById(o.canvas); this.ctx=this.cv.getContext('2d');
+    this.steps=o.steps; this.draw=o.draw; this.codeId=o.codeId||null;
+    this.i=0; this.timer=null; this.speed=o.speed||600;
+    this.descEl=document.getElementById(o.desc);
+    this.render();
+  }
+  render(){
+    const s=this.steps[this.i]; if(!s) return;
+    this.ctx.clearRect(0,0,this.cv.width,this.cv.height);
+    if(this.draw) this.draw(this.ctx,this.i);
+    // 每走一步都刷新当前行高亮（清掉旧的、加新的），与正在执行的语句对应
+    if(this.codeId && s.line) setActiveLine(this.codeId, s.line);
+    if(this.descEl) this.descEl.textContent="步骤 "+(this.i+1)+"/"+this.steps.length+"："+s.desc;
+  }
+  play(){ if(this.timer) return; this.timer=setInterval(()=>{ if(this.i>=this.steps.length-1){this.pause();return;} this.i++; this.render(); },this.speed); }
+  pause(){ clearInterval(this.timer); this.timer=null; }
+  step(){ if(this.i<this.steps.length-1){ this.i++; this.render(); } }
+  reset(){ this.i=0; this.render(); }   // 重置也回到第 1 步对应行
+}
+// 让代码块中某一行加深底色（IDE 单步观感）—— 只改样式，且仅在代码面板内部滚动，绝不让页面整体滚动
+function setActiveLine(codeId, line){
+  const el=document.getElementById(codeId); if(!el) return;
+  el.querySelectorAll('.cl.active').forEach(n=>n.classList.remove('active'));
+  const t=el.querySelector('.cl[data-line="'+line+'"]');
+  if(!t){ return; }
+  t.classList.add('active');
+  const pre=el.querySelector('pre');
+  if(pre){
+    const pr=pre.getBoundingClientRect(), tr=t.getBoundingClientRect();
+    const delta=(tr.top-pr.top)-pre.clientHeight/2+tr.height/2; // 仅调整面板内部滚动条
+    if(Math.abs(delta)>2) pre.scrollTop+=delta;
+  }
+}
+
+/* ---------- 示例：冒泡排序动画（可输入数据 / 代码联动） ---------- */
+(function buildBubble(){
+  const input=document.getElementById("bs-input");
+  const msg=document.getElementById("bs-msg");
+  let anim=null, steps=[];
+  const DEFAULT="5, 2, 8, 1, 9, 3, 7, 4, 6, 0";
+  input.value=DEFAULT;   // 打开页面即显示示例数据
+
+  function buildSteps(src){
+    if(!Array.isArray(src)||src.length<2) throw new Error("至少 2 个元素");
+    if(src.length>16) throw new Error("最多支持 16 个元素");
+    if(src.some(x=>!Number.isInteger(x)||x<0||x>999)) throw new Error("元素需为 0~999 的整数");
+    const a=src.slice(); const out=[];
+    const snap=(desc,line,ex)=>out.push(Object.assign({desc,line,arr:a.slice()},ex||{}));
+    snap("初始数组",6);
+    for(let i=0;i<a.length-1;i++){
+      for(let j=0;j<a.length-1-i;j++){
+        snap("比较 a["+j+"] 与 a["+(j+1)+"]",10,{active:[j,j+1]});
+        if(a[j]>a[j+1]){ const t=a[j]; a[j]=a[j+1]; a[j+1]=t;
+          snap("a["+j+"] > a["+(j+1)+"]，交换",11,{active:[j,j+1],swapped:true}); }
+      }
+      snap("第 "+(i+1)+" 轮结束，尾部已就位",8);
+    }
+    snap("排序完成 ✓",14,{sorted:true});
+    return out;
+  }
+  function drawBars(c,i){
+    const s=steps[i], data=s.arr, n=data.length;
+    const W=c.canvas.width,H=c.canvas.height;
+    const bw=W/n*0.7, gap=W/n*0.3, max=Math.max.apply(null,data.concat([1]));
+    for(let k=0;k<n;k++){
+      const h=data[k]/max*(H-38), x=k*(bw+gap)+gap/2, y=H-18-h;
+      let color='#3b82f6';
+      if(s.sorted) color='#7ee787';
+      else if(s.swapped && s.active && s.active.indexOf(k)>=0) color='#ff7b72';
+      else if(s.active && s.active.indexOf(k)>=0) color='#22d3ee';
+      c.fillStyle=color; c.fillRect(x,y,bw,h);
+      c.fillStyle='#9fb0c3'; c.font='12px Consolas,monospace'; c.textAlign='center';
+      c.fillText(data[k],x+bw/2,H-5);
+    }
+  }
+  function load(){
+    let arr;
+    try{
+      arr=input.value.split(/[,\s]+/).filter(s=>s.length).map(s=>{
+        const v=Number(s); if(!Number.isFinite(v)) throw new Error("含非法数字："+s); return v;
+      });
+      steps=buildSteps(arr);
+    }catch(e){ msg.textContent="⚠ "+e.message; return; }
+    msg.textContent="已加载 "+arr.length+" 个元素，点击「播放」开始";
+    if(anim) anim.pause();
+    anim=new Anim({canvas:"bs-cv",desc:"bs-desc",codeId:"bs-code",steps:steps,speed:520,draw:drawBars});
+  }
+  load();   // 默认加载示例数据
+  document.getElementById("bs-play").onclick=()=>anim.play();
+  document.getElementById("bs-pause").onclick=()=>anim.pause();
+  document.getElementById("bs-step").onclick=()=>anim.step();
+  document.getElementById("bs-reset").onclick=()=>anim.reset();
+  document.getElementById("bs-load").onclick=load;
+  input.addEventListener('keydown',e=>{ if(e.key==='Enter') load(); });
+})();
+
+/* ---------- 页面加载：块级代码逐行高亮 + LaTeX ---------- */
+window.addEventListener('load',function(){
+  // 仅对「块级代码」<pre><code class="cpp"> 做逐行高亮（行内 <code> 保持原样）
+  document.querySelectorAll('pre code.cpp').forEach(el=>{
+    const lines = el.textContent.split('\n');
+    el.innerHTML = lines.map((ln,k)=>'<div class="cl" data-line="'+(k+1)+'">'+highlightCPP(ln)+'</div>').join('');
+  });
+  if(window.katex && window.renderMathInElement){
+    renderMathInElement(document.body,{
+      delimiters:[{left:"$$",right:"$$",display:true},{left:"$",right:"$",display:false}],
+      throwOnError:false
+    });
+  }
+});
+</script>
+</body>
+</html>
